@@ -1,3 +1,4 @@
+import 'package:assignments/bloc/tugas_bloc.dart';
 import 'package:assignments/model/tugas.dart';
 import 'package:flutter/material.dart';
 // import 'package:tokokita/bloc/produk_bloc.dart';
@@ -21,10 +22,9 @@ class _TugasFormState extends State<TugasForm> {
   String judul = "TAMBAH TUGAS";
   String tombolSubmit = "SIMPAN";
 
-  final _idController = TextEditingController();
-  final _titleController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _deadlineController = TextEditingController();
+  final _titleTextboxController = TextEditingController();
+  final _descriptionTextboxController = TextEditingController();
+  final _deadlineTextboxController = TextEditingController();
 
   @override
   void initState() {
@@ -37,10 +37,9 @@ class _TugasFormState extends State<TugasForm> {
       setState(() {
         judul = "UBAH TUGAS";
         tombolSubmit = "UBAH";
-        _idController.text = widget.tugas!.id.toString();
-        _titleController.text = widget.tugas!.title!;
-        _descriptionController.text = widget.tugas!.description!;
-        _deadlineController.text = widget.tugas!.deadline.toString();
+        _titleTextboxController.text = widget.tugas!.title!;
+        _descriptionTextboxController.text = widget.tugas!.description!;
+        _deadlineTextboxController.text = widget.tugas!.deadline!;
       });
     } else {
       judul = "TAMBAH TUGAS";
@@ -59,8 +58,7 @@ class _TugasFormState extends State<TugasForm> {
             key: _formKey,
             child: Column(
               children: [
-                _idTextField(),
-                _titleTextField(),
+                _judulTextField(),
                 _descriptionTextField(),
                 _deadlineTextField(),
                 _buttonSubmit(),
@@ -72,28 +70,14 @@ class _TugasFormState extends State<TugasForm> {
     );
   }
 
-  Widget _idTextField() {
+  Widget _judulTextField() {
     return TextFormField(
-      decoration: const InputDecoration(labelText: "ID"),
-      keyboardType: TextInputType.number,
-      controller: _idController,
-      validator: (value) {
-        if (value!.isEmpty) {
-          return "ID harus diisi";
-        }
-        return null;
-      },
-    );
-  }
-
-  Widget _titleTextField() {
-    return TextFormField(
-      decoration: const InputDecoration(labelText: "Title"),
+      decoration: const InputDecoration(labelText: "Judul Tugas"),
       keyboardType: TextInputType.text,
-      controller: _titleController,
+      controller: _titleTextboxController,
       validator: (value) {
         if (value!.isEmpty) {
-          return "Title harus diisi";
+          return "Judul Tugas harus diisi";
         }
         return null;
       },
@@ -102,12 +86,12 @@ class _TugasFormState extends State<TugasForm> {
 
   Widget _descriptionTextField() {
     return TextFormField(
-      decoration: const InputDecoration(labelText: "Description"),
+      decoration: const InputDecoration(labelText: "Deskripsi Tugas"),
       keyboardType: TextInputType.text,
-      controller: _descriptionController,
+      controller: _descriptionTextboxController,
       validator: (value) {
         if (value!.isEmpty) {
-          return "Description harus diisi";
+          return "Deskripsi Tugas harus diisi";
         }
         return null;
       },
@@ -116,12 +100,12 @@ class _TugasFormState extends State<TugasForm> {
 
   Widget _deadlineTextField() {
     return TextFormField(
-      decoration: const InputDecoration(labelText: "Deadline"),
+      decoration: const InputDecoration(labelText: "Deadline Tugas"),
       keyboardType: TextInputType.text,
-      controller: _deadlineController,
+      controller: _deadlineTextboxController,
       validator: (value) {
         if (value!.isEmpty) {
-          return "Deadline harus diisi";
+          return "Deadline Tugas harus diisi";
         }
         return null;
       },
@@ -135,13 +119,7 @@ class _TugasFormState extends State<TugasForm> {
         var validate = _formKey.currentState!.validate();
         if (validate) {
           if (!_isLoading) {
-            if (widget.tugas != null) {
-              // Kondisi update tugas
-              ubah();
-            } else {
-              // Kondisi tambah tugas
-              simpan();
-            }
+            simpan();
           }
         }
       },
@@ -152,29 +130,56 @@ class _TugasFormState extends State<TugasForm> {
     setState(() {
       _isLoading = true;
     });
-    Tugas createTugas = Tugas();
-    createTugas.id = int.parse(_idController.text);
-    createTugas.title = _titleController.text;
-    createTugas.description = _descriptionController.text;
-    createTugas.deadline = DateTime.parse(_deadlineController.text);
-    // Tambahkan logika untuk menyimpan Tugas ke server atau penyimpanan data lainnya sesuai kebutuhan Anda
-    // Kemudian, Anda dapat menggunakan Navigator untuk kembali ke halaman sebelumnya.
-    // Contoh:
-    // Navigator.of(context).pop();
+
+    Tugas createTugas = Tugas(id: null);
+    createTugas.title = _titleTextboxController.text;
+    createTugas.description = _descriptionTextboxController.text;
+    createTugas.deadline = _deadlineTextboxController.text;
+
+    TugasBloc.addTugas(tugas: createTugas).then((value) {
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) => const TugasPage(),
+      ));
+    }, onError: (error) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => const WarningDialog(
+          description: "Simpan gagal, silahkan coba lagi",
+        ),
+      );
+    });
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
-  ubah() {
-    setState(() {
-      _isLoading = true;
-    });
-    Tugas updateTugas = Tugas();
-    updateTugas.id = int.parse(_idController.text);
-    updateTugas.title = _titleController.text;
-    updateTugas.description = _descriptionController.text;
-    updateTugas.deadline = DateTime.parse(_deadlineController.text);
-    // Tambahkan logika untuk mengubah Tugas di server atau penyimpanan data lainnya sesuai kebutuhan Anda
-    // Kemudian, Anda dapat menggunakan Navigator untuk kembali ke halaman sebelumnya.
-    // Contoh:
-    // Navigator.of(context).pop();
-  }
+  // ubah() {
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
+
+  //   Tugas updateTugas = Tugas(id: null);
+  //   updateTugas.id = widget.tugas!.id;
+  //   updateTugas.title = _titleTextboxController.text;
+  //   updateTugas.description = _descriptionTextboxController.text;
+  //   updateTugas.deadline = _deadlineTextboxController.text;
+
+  //   TugasBloc.updateTugas(tugas: updateTugas).then((value) {
+  //     Navigator.of(context).push(MaterialPageRoute(
+  //       builder: (BuildContext context) => const TugasPage(),
+  //     ));
+  //   }, onError: (error) {
+  //     showDialog(
+  //       context: context,
+  //       builder: (BuildContext context) => const WarningDialog(
+  //         description: "Permintaan ubah data gagal, silahkan coba lagi",
+  //       ),
+  //     );
+  //   });
+
+  //   setState(() {
+  //     _isLoading = false;
+  //   });
+  // }
 }

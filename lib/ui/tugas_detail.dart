@@ -5,13 +5,9 @@ import 'package:assignments/ui/tugas_form.dart';
 import 'package:assignments/ui/tugas_page.dart';
 
 class TugasDetail extends StatefulWidget {
-  int? id;
-  String? title;
-  String? description;
-  DateTime? deadline;
+  Tugas? tugas;
 
-  TugasDetail({Key? key, this.id, this.title, this.description, this.deadline, required Tugas tugas})
-      : super(key: key);
+  TugasDetail({Key? key, this.tugas}) : super(key: key);
 
   @override
   _TugasDetailState createState() => _TugasDetailState();
@@ -22,74 +18,77 @@ class _TugasDetailState extends State<TugasDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tugas Detail'),
+        title: const Text('Detail Tugas'),
       ),
       body: Center(
         child: Column(
           children: [
             Text(
-              "ID : ${widget.id ?? ''}",
-              style: TextStyle(fontSize: 20.0),
+              "Title : ${widget.tugas!.title}",
+              style: const TextStyle(fontSize: 20.0),
             ),
             Text(
-              "Title : ${widget.title ?? ''}",
-              style: TextStyle(fontSize: 18.0),
+              "Desccription : ${widget.tugas!.description}",
+              style: const TextStyle(fontSize: 18.0),
             ),
             Text(
-              "Description : ${widget.description ?? ''}",
-              style: TextStyle(fontSize: 18.0),
+              "Deadline :  ${widget.tugas!.deadline}",
+              style: const TextStyle(fontSize: 18.0),
             ),
-            Text(
-              "Deadline : ${widget.deadline ?? ''}",
-              style: TextStyle(fontSize: 18.0),
-            ),
-            _tombolEditHapus()
+            _tombolHapusEdit()
           ],
         ),
       ),
     );
   }
 
-  Widget _tombolEditHapus() {
+  Widget _tombolHapusEdit() {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Tombol Edit
+        // //Tombol Edit
+        // OutlinedButton(
+        //     child: const Text("EDIT"),
+        //     onPressed: () {
+        //       Navigator.push(
+        //           context,
+        //           MaterialPageRoute(
+        //               builder: (context) => TugasForm(
+        //                     tugas: widget.tugas!,
+        //                   )));
+        //     }),
+        //Tombol Hapus
         OutlinedButton(
-          child: Text("EDIT"),
-          onPressed: () {
-            // Implement your edit logic here
-          },
-        ),
-        // Tombol Hapus
-        OutlinedButton(
-          child: Text("DELETE"),
-          onPressed: () => confirmHapus(),
-        ),
+            child: const Text("DELETE"), onPressed: () => confirmHapus()),
       ],
     );
   }
 
   void confirmHapus() {
     AlertDialog alertDialog = AlertDialog(
-      content: Text("Yakin ingin menghapus data ini?"),
+      content: const Text("Yakin ingin menghapus data ini?"),
       actions: [
         // Tombol Hapus
         OutlinedButton(
-          child: Text("Ya"),
+          child: const Text("Ya"),
           onPressed: () {
-            // Implement your delete logic here
-            Navigator.pop(context);
+            TugasBloc.deleteTugas(id: widget.tugas!.id)
+                .then((value) => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TugasPage(),
+                      ),
+                    ));
           },
         ),
         // Tombol Batal
         OutlinedButton(
-          child: Text("Batal"),
+          child: const Text("Batal"),
           onPressed: () => Navigator.pop(context),
         ),
       ],
     );
 
-    showDialog(context: context, builder: (context) => alertDialog);
+    showDialog(builder: (context) => alertDialog, context: context);
   }
 }

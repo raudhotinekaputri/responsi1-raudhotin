@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'app_exception.dart';
-import 'dart:convert';
 
 class Api {
   Future<dynamic> post(dynamic url, dynamic data) async {
@@ -11,9 +10,7 @@ class Api {
       final response = await http.post(
         Uri.parse(url),
         body: data,
-        // headers: {
-        //   HttpHeaders.authorizationHeader: "Bearer $token",
-        // },
+        // headers: {HttpHeaders.authorizationHeader: "Bearer $token"});
       );
       responseJson = _returnResponse(response);
     } on SocketException {
@@ -29,10 +26,7 @@ class Api {
   //     final response = await http.put(
   //       Uri.parse(url),
   //       body: data,
-        
-  //       // headers: {
-  //       //   HttpHeaders.authorizationHeader: "Bearer $token",
-  //       // },
+  //       // headers: {HttpHeaders.authorizationHeader: "Bearer $token"});
   //     );
   //     responseJson = _returnResponse(response);
   //   } on SocketException {
@@ -47,7 +41,7 @@ class Api {
     try {
       final response = await http.get(
         Uri.parse(url),
-        // headers: {HttpHeaders.authorizationHeader: "Bearer $token"}
+        // headers: {HttpHeaders.authorizationHeader: "Bearer $token"});
       );
       responseJson = _returnResponse(response);
     } on SocketException {
@@ -57,10 +51,12 @@ class Api {
   }
 
   Future<dynamic> delete(dynamic url) async {
+    // var token = await UserInfo().getToken();
     var responseJson;
     try {
       final response = await http.post(
         Uri.parse(url),
+        // headers: {HttpHeaders.authorizationHeader: "Bearer  $token"});
       );
       responseJson = _returnResponse(response);
     } on SocketException {
@@ -75,14 +71,15 @@ class Api {
         return response;
       case 400:
         throw BadRequestException(response.body.toString());
-      case 401:
-      case 403:
+      case 481:
         throw UnauthorisedException(response.body.toString());
+      case 403:
       case 422:
         throw InvalidInputException(response.body.toString());
+      case 500:
       default:
         throw FetchDataException(
-            'Error occurred while Communication with Server with StatusCode: ${response.statusCode}');
+            'Error occured while Communication with Server with StatusCode : ${response.statusCode}');
     }
   }
 }

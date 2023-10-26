@@ -1,19 +1,26 @@
+import 'package:assignments/ui/tugas_page.dart';
 import 'package:flutter/material.dart';
-import 'package:assignments/ui/tugas_page.dart'; // Mengganti 'produk_page.dart' dengan 'tugas_page.dart'
+import 'package:assignments/ui/tugas_page.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Widget page = const CircularProgressIndicator();
+
+  @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Assignments (Raudhotin)',
-      debugShowCheckedModeBanner: false,
-      home: TugasPage(), // Mengganti 'ProdukPage()' dengan 'TugasPage()'
+    return MaterialApp(
+      title: "Tugas Raudhotin",
+      home: TugasPage(),
     );
   }
 }

@@ -17,17 +17,16 @@ class _TugasPageState extends State<TugasPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('List Tugas'),
-        automaticallyImplyLeading: false,
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 20.0),
-            child: GestureDetector(
-              child: const Icon(Icons.add, size: 26.0),
-              onTap: () async {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => TugasForm()));
-              },
-            ),
-          ),
+              padding: const EdgeInsets.only(right: 20.0),
+              child: GestureDetector(
+                child: const Icon(Icons.add, size: 26.0),
+                onTap: () async {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => TugasForm()));
+                },
+              ))
         ],
       ),
       body: FutureBuilder<List>(
@@ -55,13 +54,12 @@ class ListTugas extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: list == null ? 0 : list!.length,
-      itemBuilder: (context, i) {
-        return ItemTugas(
-          tugas: list![i],
-        );
-      },
-    );
+        itemCount: list == null ? 0 : list!.length,
+        itemBuilder: (context, i) {
+          return ItemTugas(
+            tugas: list![i],
+          );
+        });
   }
 }
 
@@ -75,18 +73,15 @@ class ItemTugas extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => TugasDetail(
-              tugas: tugas,
-            ),
-          ),
-        );
+            context,
+            MaterialPageRoute(
+                builder: (context) => TugasDetail(
+                      tugas: tugas,
+                    )));
       },
       child: Card(
         child: ListTile(
           title: Text(tugas.title!),
-          subtitle: Text(tugas.description!),
         ),
       ),
     );
